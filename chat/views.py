@@ -1,6 +1,7 @@
 from rest_framework import generics
-from .serializer import MessagesToAdminSerializer, MessagesToUserSerializer
+
 from .models import MessageAdmin, MessageUser
+from .serializer import MessagesToAdminSerializer, MessagesToUserSerializer
 
 
 class CreateMessageView(generics.CreateAPIView):
