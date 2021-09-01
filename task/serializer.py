@@ -38,7 +38,3 @@ class AswerSerilizer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = '__all__'
-
-
-
-

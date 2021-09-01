@@ -1,6 +1,5 @@
-from django.db import models
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+
 from .models import Answer, Task, ImageTask
 from .serializer import TaskSerializer, ImagesSerializer, AddAnswerSerializer, AswerSerilizer
 
@@ -53,4 +52,3 @@ class AnswerListView(generics.ListAPIView):
         author = self.request.user
         queryset = Answer.objects.filter(author=author)
         return queryset
-
