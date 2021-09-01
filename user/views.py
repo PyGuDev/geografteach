@@ -1,10 +1,11 @@
-from rest_framework import generics
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.shortcuts import redirect
 from django.contrib.auth import login, authenticate, logout
-from .serializer import CreateUserSerializer, UserSerializer
+from django.shortcuts import redirect
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .models import User, ConfirmEmail
+from .serializer import CreateUserSerializer, UserSerializer
 
 
 class SingupUser(generics.CreateAPIView):
@@ -64,6 +65,7 @@ class SingIn(APIView):
 
 class Logout(APIView):
     """Выход из аккаунта"""
+
     def get(self, request):
         try:
             logout(request)
@@ -76,4 +78,3 @@ class GetUser(generics.RetrieveAPIView):
     """Вывод информации пользователя"""
     serializer_class = UserSerializer
     queryset = User.objects.all()
-

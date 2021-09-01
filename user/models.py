@@ -1,9 +1,9 @@
-from django.db import models
-from django.core.mail import send_mail
-from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
+from django.core.mail import send_mail
+from django.db import models
+from rest_framework.authtoken.models import Token
 
 
 class UserManager(BaseUserManager):
@@ -89,9 +89,8 @@ class User(AbstractBaseUser):
         return self.is_admin
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-
         send_mail(subject, message, from_email, [self.email], **kwargs)
-    
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'

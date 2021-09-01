@@ -1,12 +1,13 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+
 from .models import User
 from .service import send_mail
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
     """Добовление пользователя"""
+
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'class_number', 'email', 'password')

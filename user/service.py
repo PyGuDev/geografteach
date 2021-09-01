@@ -1,5 +1,6 @@
-from .models import ConfirmEmail
 import uuid
+
+from .models import ConfirmEmail
 
 
 def send_mail(user):
