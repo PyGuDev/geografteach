@@ -1,11 +1,13 @@
-from django.http import HttpResponse
-from rest_framework import generics
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.utils.encoding import escape_uri_path
 from django.db import models
-from .serializer import CategorySerializer, ArticleSerilizer, CreateLikeSerializer, FileListSerializer, ImagesForArticleSerializer
-from .models import Article, Category, File, Like, ImagesForArticle
+from django.http import HttpResponse
+from django.utils.encoding import escape_uri_path
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import Article, Category, File, ImagesForArticle
+from .serializer import CategorySerializer, ArticleSerilizer, CreateLikeSerializer, FileListSerializer, \
+    ImagesForArticleSerializer
 from .service import get_client_ip, PaginationApp
 
 
@@ -116,10 +118,6 @@ class FileDownLoadView(APIView):
         file_name = obj_file.title
         file_type = obj_file.type_file
         response = HttpResponse(file, content_type='application/{}'.format(file_type))
-        response['Content-Disposition'] = "attachment; filename=" + escape_uri_path(file_name+'.'+file_type)
+        response['Content-Disposition'] = "attachment; filename=" + escape_uri_path(file_name + '.' + file_type)
 
         return response
-
-
-
-
