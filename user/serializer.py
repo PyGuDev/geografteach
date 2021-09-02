@@ -1,8 +1,5 @@
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
-
 from .models import User
-from .service import send_mail
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -11,17 +8,17 @@ class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'class_number', 'email', 'password')
+        extra_kwargs = {'password': {'write_only': False}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(
-            email=validated_data.get('email'),
-            first_name=validated_data.get('first_name'),
-            last_name=validated_data.get('last_name'),
-            class_number=validated_data.get('class_number'),
-            password=validated_data.get('password')
+        user = User(
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            class_number=validated_data['class_number'],
+            email=validated_data['email'],
         )
-        Token.objects.create(user=user)
-        send_mail(user)
+        user.set_password(validated_data['password'])
+        user.save()
         return user
 
 
