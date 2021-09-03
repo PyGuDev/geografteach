@@ -30,7 +30,7 @@ class AddAnswerSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'description', 'file_answer', 'task')
 
 
-class AswerSerilizer(serializers.ModelSerializer):
+class AnswerSerializer(serializers.ModelSerializer):
     """Вывод полной информации ответа"""
     author = serializers.SlugRelatedField(slug_field='email', read_only=True)
     task = serializers.SlugRelatedField(slug_field='title', read_only=True)
