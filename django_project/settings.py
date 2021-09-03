@@ -8,9 +8,9 @@ read_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = 'x7dF2cMPs07bY3QP3fil03k6k92WzNCPkKe1B8oyI7VDADEeu6JK3qJjSJMfQZQz'
 
 
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['194.58.121.102', '2a00:f940:2:4:2::117c', '194-58-121-102.cloudvps.regruhosting.ru', 'geografteach.ru']
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'user.User'
 
@@ -126,3 +126,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     )
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
