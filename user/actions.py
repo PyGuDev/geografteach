@@ -1,10 +1,14 @@
+import smtplib
+from typing import Any
+
 from rest_framework.request import Request
-
+from django_project.exceptions import BadRequestException
 from user.serializer import CreateUserSerializer
-from .service import SendConfirmMail
+from .models import ConfirmEmail
+from .service import Mail
 
 
-class RegistrationUser:
+class RegistrationUserAction:
     def __init__(self, request: Request):
         self._request = request
 
@@ -12,6 +16,39 @@ class RegistrationUser:
         serializer = CreateUserSerializer(data=self._request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        SendConfirmMail.send_mail(user)
+        try:
+            Mail.send_mail(user)
+        except smtplib.SMTPSenderRefused as e:
+            print('Smtp error: {}'.format(e))
 
 
+class ConfirmationEmailAction:
+    def __init__(self, code: str):
+        self._code = self._validate_code(code)
+
+    def _validate_code(self, code: Any) -> str:
+        if code and type(code) == str:
+            return code
+        else:
+            raise BadRequestException(message='Code is required parameter was not passed', code='required_parameter')
+
+    def confirm(self):
+        confirm_model = self._get_confirm_model()
+        confirm_model.active = True
+        self._validate_user(confirm_model)
+        confirm_model.user.is_active = True
+        confirm_model.user.save()
+        confirm_model.save()
+
+    def _get_confirm_model(self) -> ConfirmEmail:
+        try:
+            return ConfirmEmail.objects.get(code=self._code)
+        except ConfirmEmail.DoesNotExist:
+            raise BadRequestException(data={"message": "the key does not exist", 'code': 'does_not_exist'})
+
+    def _validate_user(self, confirm_model: ConfirmEmail):
+        if confirm_model.user is None:
+            raise BadRequestException(message="User does not exist", code="not_user")
+
+        if confirm_model.user.is_active:
+            raise BadRequestException(message="This user is already activated", code='is_activated')
