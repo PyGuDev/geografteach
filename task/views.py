@@ -1,7 +1,7 @@
 from rest_framework import generics
 
 from .models import Answer, Task, ImageTask
-from .serializer import TaskSerializer, ImagesSerializer, AddAnswerSerializer, AswerSerilizer
+from .serializer import TaskSerializer, ImagesSerializer, AddAnswerSerializer, AnswerSerializer
 
 
 class TaskListView(generics.ListAPIView):
@@ -29,24 +29,24 @@ class TaskImagesView(generics.ListAPIView):
         return queryset
 
 
-class AddAswerView(generics.CreateAPIView):
+class AddAnswerView(generics.CreateAPIView):
     """Добовлени ответа"""
     serializer_class = AddAnswerSerializer
 
 
 class AnswerView(generics.ListAPIView):
     """Вывод ответа"""
-    serializer_class = AswerSerilizer
+    serializer_class = AnswerSerializer
 
     def get_queryset(self):
-        id_task = self.request.path.split('/')[-1]
-        queryset = Answer.objects.filter(task=id_task)
+        pk = self.kwargs.get('pk')
+        queryset = Answer.objects.filter(task_pk=pk)
         return queryset
 
 
 class AnswerListView(generics.ListAPIView):
     """Вывод списка ответов"""
-    serializer_class = AswerSerilizer
+    serializer_class = AnswerSerializer
 
     def get_queryset(self):
         author = self.request.user
