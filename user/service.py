@@ -3,7 +3,7 @@ import uuid
 from .models import ConfirmEmail, User
 
 
-class SendConfirmMail:
+class Mail:
     @staticmethod
     def send_mail(user: User):
         """Отправка писма подтверждения"""
