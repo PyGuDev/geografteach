@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from django_project.response import AccessResponse, BadResponse
+from django_project.response import AccessResponse
 
-from .actions import RegistrationUser
-from .models import User, ConfirmEmail
+from .actions import RegistrationUserAction, ConfirmationEmailAction
+from .models import User
 from .serializer import CreateUserSerializer, UserSerializer
 
 
@@ -19,8 +19,7 @@ class SignUpUser(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
 
     def create(self, request, *args, **kwargs):
-        RegistrationUser(request).create()
-
+        RegistrationUserAction(request).create()
         return AccessResponse()
 
 
@@ -28,26 +27,10 @@ class ConfirmUser(APIView):
     """Подтверждение пользователя"""
     permission_classes = ()
 
-    def get(self, requset):
-        code = requset.GET['key']
-        try:
-            conf_email = ConfirmEmail.objects.get(code=code)
-            conf_email.active = True
-        except:
-            return Response(status=400, data={"error": "the key does not exist"})
-
-        try:
-            user = User.objects.get(email=conf_email.user)
-        except:
-            return Response(status=400, data={"error": "user does not exist"})
-
-        if user.is_active == True:
-            return Response(status=200, data={"warning": "This user is already activated"})
-        else:
-            user.is_active = True
-        user.save()
-        conf_email.save()
-        return redirect('http://geografteach.ru/user/singin')
+    def get(self, request):
+        code = request.GET['key']
+        ConfirmationEmailAction(code).confirm()
+        return redirect('https://geografteach.ru/user/singin')
 
 
 class SingIn(TokenObtainPairView):
