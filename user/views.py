@@ -1,21 +1,27 @@
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
 from rest_framework import generics
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
+from django_project.response import AccessResponse, BadResponse
+
+from .actions import RegistrationUser
 from .models import User, ConfirmEmail
 from .serializer import CreateUserSerializer, UserSerializer
 
 
-class SingupUser(generics.CreateAPIView):
+class SignUpUser(generics.CreateAPIView):
     """Регистрация пользователя"""
     serializer_class = CreateUserSerializer
-    authentication_classes = ()
-    permission_classes = ()
+    permission_classes = (permissions.AllowAny,)
 
-    def perform_create(self, serializer):
-        serializer.save()
+    def create(self, request, *args, **kwargs):
+        RegistrationUser(request).create()
+
+        return AccessResponse()
 
 
 class ConfirmUser(APIView):
@@ -36,7 +42,7 @@ class ConfirmUser(APIView):
             return Response(status=400, data={"error": "user does not exist"})
 
         if user.is_active == True:
-            return Response(status=202, data={"warning": "This user is already activated"})
+            return Response(status=200, data={"warning": "This user is already activated"})
         else:
             user.is_active = True
         user.save()
@@ -44,23 +50,9 @@ class ConfirmUser(APIView):
         return redirect('http://geografteach.ru/user/singin')
 
 
-class SingIn(APIView):
+class SingIn(TokenObtainPairView):
     """Авторизация пользователя"""
-    http_method_names = ['post']
-    permission_classes = ()
-
-    def post(self, requset):
-        email = requset.data["email"]
-        password = requset.data['password']
-        user = authenticate(requset, username=email, password=password)
-        if user is not None:
-            login(requset, user)
-            if user.is_admin:
-                return Response({"token": user.auth_token.key, "user": user.email, "id": user.id, "admin": True})
-            else:
-                return Response({"token": user.auth_token.key, "user": user.email, "id": user.id, "admin": False})
-        else:
-            return Response({"error": "Wrong Credentials"}, status=400)
+    pass
 
 
 class Logout(APIView):
