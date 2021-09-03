@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 from dotenv import read_dotenv
 
@@ -8,9 +9,9 @@ read_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = 'x7dF2cMPs07bY3QP3fil03k6k92WzNCPkKe1B8oyI7VDADEeu6JK3qJjSJMfQZQz'
 
 
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['194.58.121.102', '2a00:f940:2:4:2::117c', '194-58-121-102.cloudvps.regruhosting.ru', 'geografteach.ru']
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'user.User'
 
@@ -99,7 +100,10 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static/')
+]
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 
 MEDIA_URL = '/media/'
@@ -119,10 +123,15 @@ MAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
