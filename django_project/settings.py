@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 from dotenv import read_dotenv
 
@@ -99,7 +100,10 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static/')
+]
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 
 MEDIA_URL = '/media/'
@@ -119,12 +123,18 @@ MAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     )
 }
 
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}

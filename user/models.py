@@ -58,9 +58,9 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
-    first_name = models.CharField("Имя", max_length=255, blank=True, null=True)
-    last_name = models.CharField("Фамилия", max_length=255, blank=True, null=True)
-    class_number = models.CharField("Класс", max_length=9, blank=True, null=True, choices=CLASS_NUMBERS)
+    first_name = models.CharField("Имя", max_length=255)
+    last_name = models.CharField("Фамилия", max_length=255)
+    class_number = models.CharField("Класс", max_length=9, choices=CLASS_NUMBERS)
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
