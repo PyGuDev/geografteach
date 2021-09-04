@@ -13,9 +13,9 @@ class Mail:
             user=user,
         )
         subject = "Активация аккаунта"
-        massega = """
+        message = """
             Для активации аккаунта пройдите по ссылке:
             http://geografteach.ru/api/user/confirm/?key={}
         """.format(code)
         from_email = "gubaev1999@gmail.com"
-        user.email_user(subject=subject, message=massega, from_email=from_email)
+        user.email_user(subject=subject, message=message, from_email=from_email)
