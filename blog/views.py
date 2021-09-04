@@ -2,15 +2,17 @@ import django_filters
 from django.db import models
 from django.http import HttpResponse
 from django.utils.encoding import escape_uri_path
+from django_project.response import AccessResponse
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .actions import LikeArticle
 from .models import Article, Category, File, ImagesForArticle
-from .serializer import CategorySerializer, ArticleSerializer, CreateLikeSerializer, FileListSerializer, \
+from .serializer import CategorySerializer, ArticleSerializer, FileListSerializer, \
     ImagesForArticleSerializer
-from .service import get_client_ip, PaginationApp
+from .service import PaginationApp
 from .filters import ArticleFilter
 
 
@@ -74,12 +76,11 @@ class SingleArticleView(generics.RetrieveAPIView):
 
 class AddLikeArticleView(generics.CreateAPIView):
     """Добовление лайков"""
-    serializer_class = CreateLikeSerializer
     permission_classes = (permissions.AllowAny,)
 
-    def perform_create(self, serializer):
-        print(self.request.POST)
-        serializer.save(ip=get_client_ip(self.request))
+    def create(self, request, *args, **kwargs):
+        LikeArticle(request, self.kwargs.get('pk')).add_like()
+        return AccessResponse()
 
 
 class FileListView(generics.ListAPIView):
