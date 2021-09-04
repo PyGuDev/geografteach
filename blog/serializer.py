@@ -45,21 +45,6 @@ class ImagesForArticleSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CreateLikeSerializer(serializers.ModelSerializer):
-    """Сериалайзер лайков"""
-    class Meta:
-        model = Like
-        fields = ('like', 'article')
-
-    def create(self, validated_data):
-        like, _ = Like.objects.update_or_create(
-            ip=validated_data.get('ip', None),
-            article=validated_data.get('article', None),
-            defaults={'like': validated_data.get('like')}
-        )
-        return like
-
-
 class FileListSerializer(serializers.ModelSerializer):
     """Сериалайзер файлов"""
     class Meta:
