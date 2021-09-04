@@ -61,7 +61,7 @@ class SingleArticleView(generics.RetrieveAPIView):
         ).annotate(
             count_like=models.Count('likes', filter=models.Q(likes__like=True))
         )
-        pk = self.request.path.rsplit('/')[-2]
+        pk = self.kwargs.get('pk')
         obj = queryset.get(pk=pk)
         obj.visit += 1
         obj.save()
