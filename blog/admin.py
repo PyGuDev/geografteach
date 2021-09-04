@@ -9,8 +9,8 @@ class ImagesForArticleInline(admin.TabularInline):
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_filter = ('category', 'avilable')
-    list_display = ('id', 'title', 'category', 'pub_date', 'avilable')
+    list_filter = ('category', 'is_available')
+    list_display = ('id', 'title', 'category', 'pub_date', 'is_available')
     list_display_links = ('id', 'title')
     inlines = [ImagesForArticleInline]
 

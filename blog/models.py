@@ -20,7 +20,7 @@ class Article(models.Model):
     text = models.TextField('Текст', blank=False)
     img = models.ImageField('Изображение', blank=True)
     url_youtube = models.URLField('Ссылка на ютуб видео', blank=True)
-    avilable = models.BooleanField('Активно', default=True)
+    is_available = models.BooleanField('Активно', default=True)
     pub_date = models.DateField('Дата публикации', auto_now_add=True, blank=True)
     visit = models.IntegerField('Просмотры', default=0)
 
