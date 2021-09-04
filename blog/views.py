@@ -12,7 +12,7 @@ from .actions import LikeArticle
 from .models import Article, Category, File, ImagesForArticle
 from .serializer import CategorySerializer, ArticleSerializer, FileListSerializer, \
     ImagesForArticleSerializer
-from .service import PaginationApp
+from .service import PaginationApp, get_client_ip
 from .filters import ArticleFilter
 
 
@@ -32,15 +32,7 @@ class ArticleListView(generics.ListAPIView):
     filterset_class = ArticleFilter
 
     def get_queryset(self):
-        queryset = Article.objects.filter(is_available=True).annotate(
-            like_user=models.Count(
-                "likes",
-                filter=models.Q(likes__ip=get_client_ip(self.request), likes__like=True)
-            )
-        ).annotate(
-            count_like=models.Count('likes', filter=models.Q(likes__like=True))
-        ).order_by('pk')
-        return queryset
+        return Article.objects.get_article_with_likes(self.request)
 
 
 class ImagesForArticleView(generics.ListAPIView):
@@ -59,19 +51,13 @@ class SingleArticleView(generics.RetrieveAPIView):
     permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
-        queryset = Article.objects.filter(is_available=True).annotate(
-            like_user=models.Count(
-                "likes",
-                filter=models.Q(likes__ip=get_client_ip(self.request), likes__like=True)
-            )
-        ).annotate(
-            count_like=models.Count('likes', filter=models.Q(likes__like=True))
-        )
-        pk = self.kwargs.get('pk')
-        obj = queryset.get(pk=pk)
+        return Article.objects.get_article_with_likes(self.request)
+
+    def get_object(self):
+        obj = super().get_object()
         obj.visit += 1
         obj.save()
-        return queryset
+        return obj
 
 
 class AddLikeArticleView(generics.CreateAPIView):
