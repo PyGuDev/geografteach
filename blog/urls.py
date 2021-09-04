@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import CategoryView, ArticleListView, ImagesForArticleView, SingleArticleView, \
-    AddLikeArticleView, FileListView, FileDownLoadView
+    AddLikeArticleView, FileListView
 
 
 urlpatterns = [
@@ -10,5 +10,4 @@ urlpatterns = [
     path('blog/category/', CategoryView.as_view()),
     path('blog/images/', ImagesForArticleView.as_view()),
     path('blog/files/', FileListView.as_view()),
-    path('download/file/', FileDownLoadView.as_view()),
 ]

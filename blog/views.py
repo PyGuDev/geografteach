@@ -1,5 +1,4 @@
 import django_filters
-from django.db import models
 from django.http import HttpResponse
 from django.utils.encoding import escape_uri_path
 from django_project.response import AccessResponse
@@ -72,25 +71,5 @@ class AddLikeArticleView(generics.CreateAPIView):
 class FileListView(generics.ListAPIView):
     """Вывод списка файлов"""
     serializer_class = FileListSerializer
-    queryset = File.objects.all().order_by('-pk')
+    queryset = File.objects.all()
     permission_classes = (permissions.AllowAny,)
-
-
-class FileDownLoadView(APIView):
-    """Загрузка файлов"""
-    permission_classes = (permissions.AllowAny,)
-
-    def get(self, request):
-        file_id = request.GET.__getitem__('id')
-        try:
-            obj_file = File.objects.get(id=file_id)
-        except File.DoesNotExist:
-            return Response(status=400, data={"error": "Такого файла не существует"})
-
-        file = open(obj_file.file.path, 'rb').read()
-        file_name = obj_file.title
-        file_type = obj_file.type_file
-        response = HttpResponse(file, content_type='application/{}'.format(file_type))
-        response['Content-Disposition'] = "attachment; filename=" + escape_uri_path(file_name + '.' + file_type)
-
-        return response
