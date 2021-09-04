@@ -1,4 +1,7 @@
 from django.db import models
+from rest_framework.request import Request
+
+from blog.service import get_client_ip
 
 
 class Category(models.Model):
@@ -13,6 +16,18 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
 
+class ArticleManager(models.Manager):
+    def get_article_with_likes(self, request: Request):
+        return self.model.objects.filter(is_available=True).annotate(
+            like_user=models.Count(
+                "likes",
+                filter=models.Q(likes__ip=get_client_ip(request), likes__like=True)
+            )
+        ).annotate(
+            count_like=models.Count('likes', filter=models.Q(likes__like=True))
+        ).order_by('pk')
+
+
 class Article(models.Model):
     """Пост"""
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
@@ -23,6 +38,8 @@ class Article(models.Model):
     is_available = models.BooleanField('Активно', default=True)
     pub_date = models.DateField('Дата публикации', auto_now_add=True, blank=True)
     visit = models.IntegerField('Просмотры', default=0)
+
+    objects = ArticleManager()
 
     def __str__(self):
         return self.title
