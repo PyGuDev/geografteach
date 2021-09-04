@@ -7,8 +7,11 @@ class BaseResponse(Response):
     def __init__(self, data: dict = None, message: str = None, code: str = None):
         if data:
             self._data = data
-        else:
+        elif message and code:
             self._data = {'message': message, 'code': code}
+        else:
+            self._data = None
+
         super().__init__(self._data)
 
 
