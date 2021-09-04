@@ -90,6 +90,7 @@ class File(models.Model):
     class Meta:
         verbose_name = 'Файл'
         verbose_name_plural = 'Файлы'
+        ordering = ['-pk']
 
     # Переопределил метод save для сохранения размера файла
     def save(self, *args, **kwargs):
