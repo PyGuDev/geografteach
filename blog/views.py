@@ -1,3 +1,4 @@
+import django_filters
 from django.db import models
 from django.http import HttpResponse
 from django.utils.encoding import escape_uri_path
@@ -10,6 +11,7 @@ from .models import Article, Category, File, ImagesForArticle
 from .serializer import CategorySerializer, ArticleSerializer, CreateLikeSerializer, FileListSerializer, \
     ImagesForArticleSerializer
 from .service import get_client_ip, PaginationApp
+from .filters import ArticleFilter
 
 
 class CategoryView(generics.ListAPIView):
@@ -24,6 +26,8 @@ class ArticleListView(generics.ListAPIView):
     serializer_class = ArticleSerializer
     pagination_class = PaginationApp
     permission_classes = (permissions.AllowAny,)
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_class = ArticleFilter
 
     def get_queryset(self):
         queryset = Article.objects.filter(is_available=True).annotate(
