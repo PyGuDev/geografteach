@@ -1,9 +1,8 @@
 from django.urls import path
-from .views import CategoryView, ArticleListView, ImagesForArticleView, ArticleFilterView, SingleArticleView, AddLikeArticleView, FileListView, FileDownLoadView
+from .views import CategoryView, ArticleListView, ImagesForArticleView, SingleArticleView, AddLikeArticleView, FileListView, FileDownLoadView
 
 
 urlpatterns = [
-    path('blog/filter/', ArticleFilterView.as_view()),
     path('blog/', ArticleListView.as_view()),
     path('blog/article/<int:pk>/', SingleArticleView.as_view()),
     path('blog/addLike', AddLikeArticleView.as_view()),

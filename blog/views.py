@@ -2,11 +2,12 @@ from django.db import models
 from django.http import HttpResponse
 from django.utils.encoding import escape_uri_path
 from rest_framework import generics
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Article, Category, File, ImagesForArticle
-from .serializer import CategorySerializer, ArticleSerilizer, CreateLikeSerializer, FileListSerializer, \
+from .serializer import CategorySerializer, ArticleSerializer, CreateLikeSerializer, FileListSerializer, \
     ImagesForArticleSerializer
 from .service import get_client_ip, PaginationApp
 
@@ -15,17 +16,17 @@ class CategoryView(generics.ListAPIView):
     """Вывод категорий"""
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
-    permission_classes = ()
+    permission_classes = (permissions.AllowAny,)
 
 
 class ArticleListView(generics.ListAPIView):
     """Вывод списка постов"""
-    serializer_class = ArticleSerilizer
+    serializer_class = ArticleSerializer
     pagination_class = PaginationApp
-    permission_classes = ()
+    permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
-        queryset = Article.objects.filter(avilable=True).annotate(
+        queryset = Article.objects.filter(is_available=True).annotate(
             like_user=models.Count(
                 "likes",
                 filter=models.Q(likes__ip=get_client_ip(self.request), likes__like=True)
@@ -39,39 +40,20 @@ class ArticleListView(generics.ListAPIView):
 class ImagesForArticleView(generics.ListAPIView):
     """Вывод списка изображений для поста"""
     serializer_class = ImagesForArticleSerializer
-    parser_classes = ()
-    permission_classes = ()
+    permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
         queryset = ImagesForArticle.objects.filter(article=self.request.GET['id'])
         return queryset
 
 
-class ArticleFilterView(generics.ListAPIView):
-    """Вывод списка постов для фильтрации"""
-    serializer_class = ArticleSerilizer
-    permission_classes = ()
-
-    def get_queryset(self):
-        queryset = Article.objects.filter(avilable=True).annotate(
-            like_user=models.Count(
-                "likes",
-                filter=models.Q(likes__ip=get_client_ip(self.request), likes__like=True)
-            )
-        ).annotate(
-            count_like=models.Count('likes', filter=models.Q(likes__like=True))
-        )
-        print(self.request)
-        return queryset
-
-
 class SingleArticleView(generics.RetrieveAPIView):
     """Вывод детальной информации и посте"""
-    serializer_class = ArticleSerilizer
-    permission_classes = ()
+    serializer_class = ArticleSerializer
+    permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
-        queryset = Article.objects.filter(avilable=True).annotate(
+        queryset = Article.objects.filter(is_available=True).annotate(
             like_user=models.Count(
                 "likes",
                 filter=models.Q(likes__ip=get_client_ip(self.request), likes__like=True)
@@ -89,7 +71,7 @@ class SingleArticleView(generics.RetrieveAPIView):
 class AddLikeArticleView(generics.CreateAPIView):
     """Добовление лайков"""
     serializer_class = CreateLikeSerializer
-    permission_classes = ()
+    permission_classes = (permissions.AllowAny,)
 
     def perform_create(self, serializer):
         print(self.request.POST)
@@ -100,12 +82,12 @@ class FileListView(generics.ListAPIView):
     """Вывод списка файлов"""
     serializer_class = FileListSerializer
     queryset = File.objects.all().order_by('-pk')
-    permission_classes = ()
+    permission_classes = (permissions.AllowAny,)
 
 
 class FileDownLoadView(APIView):
     """Загрузка файлов"""
-    permission_classes = ()
+    permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
         file_id = request.GET.__getitem__('id')
