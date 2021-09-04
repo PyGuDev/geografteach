@@ -18,6 +18,8 @@ class LikeArticle:
             like.like = not like.like
         like.save()
 
+        return self._generate_response_data(like)
+
     def _get_article(self):
         try:
             return Article.objects.get(pk=self._pk_article)
@@ -26,3 +28,10 @@ class LikeArticle:
                 message='An article with this id={} was not found'.format(self._pk_article),
                 code='not_found'
             )
+
+    @staticmethod
+    def _generate_response_data(like: Like):
+        return {
+            'like': like.like,
+            'article': like.article.id
+        }

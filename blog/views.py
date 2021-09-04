@@ -79,8 +79,8 @@ class AddLikeArticleView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
 
     def create(self, request, *args, **kwargs):
-        LikeArticle(request, self.kwargs.get('pk')).add_like()
-        return AccessResponse()
+        data = LikeArticle(request, self.kwargs.get('pk')).add_like()
+        return AccessResponse(data)
 
 
 class FileListView(generics.ListAPIView):
