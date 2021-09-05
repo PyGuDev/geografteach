@@ -8,13 +8,13 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SinglArticleSerializer(serializers.ModelSerializer):
+class SingleArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = '__all__'
 
 
-class ArticleSerilizer(serializers.ModelSerializer):
+class ArticleSerializer(serializers.ModelSerializer):
     """Сериализация постов"""
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
     like_user = serializers.BooleanField()
@@ -30,7 +30,7 @@ class ArticleSerilizer(serializers.ModelSerializer):
             'text',
             'img',
             'url_youtube',
-            'avilable',
+            'is_available',
             'pub_date',
             'visit',
             'like_user',
@@ -43,21 +43,6 @@ class ImagesForArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImagesForArticle
         fields = "__all__"
-
-
-class CreateLikeSerializer(serializers.ModelSerializer):
-    """Сериалайзер лайков"""
-    class Meta:
-        model = Like
-        fields = ('like', 'article')
-
-    def create(self, validated_data):
-        like, _ = Like.objects.update_or_create(
-            ip=validated_data.get('ip', None),
-            article=validated_data.get('article', None),
-            defaults={'like': validated_data.get('like')}
-        )
-        return like
 
 
 class FileListSerializer(serializers.ModelSerializer):

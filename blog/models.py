@@ -1,4 +1,7 @@
 from django.db import models
+from rest_framework.request import Request
+
+from blog.service import get_client_ip
 
 
 class Category(models.Model):
@@ -13,6 +16,18 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
 
+class ArticleManager(models.Manager):
+    def get_article_with_likes(self, request: Request):
+        return self.model.objects.filter(is_available=True).annotate(
+            like_user=models.Count(
+                "likes",
+                filter=models.Q(likes__ip=get_client_ip(request), likes__is_like=True)
+            )
+        ).annotate(
+            count_like=models.Count('likes', filter=models.Q(likes__is_like=True))
+        ).order_by('pk')
+
+
 class Article(models.Model):
     """Пост"""
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
@@ -20,9 +35,11 @@ class Article(models.Model):
     text = models.TextField('Текст', blank=False)
     img = models.ImageField('Изображение', blank=True)
     url_youtube = models.URLField('Ссылка на ютуб видео', blank=True)
-    avilable = models.BooleanField('Активно', default=True)
+    is_available = models.BooleanField('Активно', default=True)
     pub_date = models.DateField('Дата публикации', auto_now_add=True, blank=True)
     visit = models.IntegerField('Просмотры', default=0)
+
+    objects = ArticleManager()
 
     def __str__(self):
         return self.title
@@ -48,11 +65,11 @@ class ImagesForArticle(models.Model):
 class Like(models.Model):
     """Лайки"""
     ip = models.CharField('IP адресс', max_length=15)
-    like = models.BooleanField('Нравится')
+    is_like = models.BooleanField('Нравится', null=True)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name='Пост', related_name="likes")
 
     def __str__(self):
-        return f"{self.like} - {self.article}"
+        return f"{self.is_like} - {self.article}"
 
     class Meta:
         verbose_name = "Лайк"
@@ -73,6 +90,7 @@ class File(models.Model):
     class Meta:
         verbose_name = 'Файл'
         verbose_name_plural = 'Файлы'
+        ordering = ['-pk']
 
     # Переопределил метод save для сохранения размера файла
     def save(self, *args, **kwargs):
