@@ -13,9 +13,9 @@ class LikeArticle:
     def add_like(self):
         like, created = Like.objects.get_or_create(ip=get_client_ip(self._request), article=self._get_article())
         if created:
-            like.like = True
+            like.is_like = True
         else:
-            like.like = not like.like
+            like.is_like = not like.is_like
         like.save()
 
         return self._generate_response_data(like)
@@ -32,6 +32,6 @@ class LikeArticle:
     @staticmethod
     def _generate_response_data(like: Like):
         return {
-            'like': like.like,
+            'like': like.is_like,
             'article': like.article.id
         }
