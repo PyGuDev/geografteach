@@ -21,10 +21,10 @@ class ArticleManager(models.Manager):
         return self.model.objects.filter(is_available=True).annotate(
             like_user=models.Count(
                 "likes",
-                filter=models.Q(likes__ip=get_client_ip(request), likes__like=True)
+                filter=models.Q(likes__ip=get_client_ip(request), likes__is_like=True)
             )
         ).annotate(
-            count_like=models.Count('likes', filter=models.Q(likes__like=True))
+            count_like=models.Count('likes', filter=models.Q(likes__is_like=True))
         ).order_by('pk')
 
 
@@ -65,11 +65,11 @@ class ImagesForArticle(models.Model):
 class Like(models.Model):
     """Лайки"""
     ip = models.CharField('IP адресс', max_length=15)
-    like = models.BooleanField('Нравится')
+    is_like = models.BooleanField('Нравится')
     article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name='Пост', related_name="likes")
 
     def __str__(self):
-        return f"{self.like} - {self.article}"
+        return f"{self.is_like} - {self.article}"
 
     class Meta:
         verbose_name = "Лайк"

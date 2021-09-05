@@ -17,8 +17,8 @@ class ArticleAdmin(admin.ModelAdmin):
 
 @admin.register(Like)
 class LikeAdmin(admin.ModelAdmin):
-    list_filter = ('like', 'ip')
-    list_display = ('like', 'ip', 'article')
+    list_filter = ('is_like', 'ip')
+    list_display = ('is_like', 'ip', 'article')
 
 
 @admin.register(File)
