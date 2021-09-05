@@ -65,7 +65,7 @@ class ImagesForArticle(models.Model):
 class Like(models.Model):
     """Лайки"""
     ip = models.CharField('IP адресс', max_length=15)
-    is_like = models.BooleanField('Нравится')
+    is_like = models.BooleanField('Нравится', null=True)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name='Пост', related_name="likes")
 
     def __str__(self):
