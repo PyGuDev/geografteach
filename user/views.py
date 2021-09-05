@@ -39,3 +39,6 @@ class GetUserAPIView(generics.RetrieveAPIView):
     """Вывод информации пользователя"""
     serializer_class = UserSerializer
     queryset = User.objects.all()
+
+    def get_object(self):
+        return self.queryset.get(id=self.request.user.id)
