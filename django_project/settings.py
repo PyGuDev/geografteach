@@ -113,6 +113,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 CORS_ORIGIN_WHITELIST = [
     "http://194.58.121.102:80",
     "http://geografteach.ru",
+    "http://localhost:8080"
 ]
 
 EMAIL_HOST = 'smtp.gmail.com'
