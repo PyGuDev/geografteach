@@ -23,6 +23,8 @@ class Task(models.Model):
     date = models.DateTimeField('Дата сдачи')
     available = models.BooleanField('Автивно', default=True)
 
+    objects = TaskManager()
+
     def __str__(self):
         return self.title
 
