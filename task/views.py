@@ -24,7 +24,7 @@ class TaskImagesView(generics.ListAPIView):
     serializer_class = ImagesSerializer
 
     def get_queryset(self):
-        pk = self.request.path.split('/')[-2]
+        pk = self.kwargs.get('pk')
         queryset = ImageTask.objects.filter(to_task=pk)
         return queryset
 
