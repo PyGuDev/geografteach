@@ -2,6 +2,11 @@ from django.db import models
 from user.models import User
 
 
+class TaskManager(models.Manager):
+    def get_available_tasks(self):
+        return self.get_queryset().filter(available=True)
+
+
 class Task(models.Model):
     CLASS_NUMBERS = (
         ('5', '5 класс'),
@@ -16,7 +21,7 @@ class Task(models.Model):
     class_student = models.CharField('Класс', max_length=15, choices=CLASS_NUMBERS)
     description = models.TextField('Описание')
     date = models.DateTimeField('Дата сдачи')
-    avilable = models.BooleanField('Автивно', default=True)
+    available = models.BooleanField('Автивно', default=True)
 
     def __str__(self):
         return self.title
@@ -39,7 +44,7 @@ class Answer(models.Model):
     file_answer = models.FileField('Файл ответа', blank=True)
     task = models.ForeignKey(Task, verbose_name='Задание', on_delete=models.CASCADE)
     estimation = models.CharField('Оценка', max_length=24, choices=ESTIMATION, blank=True)
-    commets_answer = models.TextField('Комментарий к ответу', blank=True)
+    comments_answer = models.TextField('Комментарий к ответу', blank=True)
 
     def __str__(self):
         return self.id.__str__() + '_' + self.author.first_name + '_' + self.author.last_name
