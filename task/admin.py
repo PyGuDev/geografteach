@@ -9,8 +9,8 @@ class ImageTaskInline(admin.TabularInline):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_filter = ['avilable', 'class_student']
-    list_display = ('id', 'title', 'date', 'avilable', 'class_student')
+    list_filter = ['available', 'class_student']
+    list_display = ('id', 'title', 'date', 'available', 'class_student')
     search_fields = ['title']
     list_display_links = ('id', 'title')
     inlines = [ImageTaskInline]
