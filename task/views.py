@@ -10,13 +10,13 @@ class TaskListView(generics.ListAPIView):
 
     def get_queryset(self):
         class_number = self.request.user.class_number
-        queryset = Task.objects.filter(avilable=True, class_student=class_number)
+        queryset = Task.objects.get_available_tasks().filter(class_student=class_number)
         return queryset
 
 
 class TaskView(generics.RetrieveAPIView):
     serializer_class = TaskSerializer
-    queryset = Task.objects.filter(avilable=True)
+    queryset = Task.objects.get_available_tasks()
 
 
 class TaskImagesView(generics.ListAPIView):
@@ -24,7 +24,7 @@ class TaskImagesView(generics.ListAPIView):
     serializer_class = ImagesSerializer
 
     def get_queryset(self):
-        pk = self.request.path.split('/')[-2]
+        pk = self.kwargs.get('pk')
         queryset = ImageTask.objects.filter(to_task=pk)
         return queryset
 
