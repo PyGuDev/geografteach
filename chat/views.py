@@ -1,6 +1,6 @@
 from rest_framework.generics import CreateAPIView, ListAPIView
 
-from django_project.response import AccessResponse, BadResponse
+from django_project.response import AccessResponse, CreatedResponse
 
 from .actions import CreateMessage, CreateChat
 from .serializer import ChatSerializer, MessageSerializer, CreateMessageSerializer
@@ -14,7 +14,7 @@ class CreateChatAPIView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         response_data = CreateChat(data, self.request.user).create()
-        return AccessResponse(data=response_data)
+        return CreatedResponse(data=response_data)
 
 
 class CreateMessageAPIView(CreateAPIView):
@@ -28,7 +28,7 @@ class CreateMessageAPIView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         data = self.request.data.copy()
         response_data = CreateMessage(data, self.request.user, self.get_object()).create()
-        return AccessResponse(data=response_data)
+        return CreatedResponse(data=response_data)
 
 
 class ListMessageAPIView(ListAPIView):
