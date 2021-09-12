@@ -1,26 +1,39 @@
+import uuid
+
 from django.db import models
 from user.models import User
 
 
-class MessageUser(models.Model):
+class MessageType:
+    IN = 'incoming'
+    OUT = 'outgoing'
+
+
+class Message(models.Model):
+    TYPE_MESSAGE_CHOICES = [
+        (MessageType.OUT, 'Исходящие'),
+        (MessageType.IN, 'Входящие')
+    ]
+    id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)
     text = models.TextField('Текст сообщения')
-    author = models.ForeignKey(User, verbose_name='Отправитель', on_delete=models.CASCADE)
+    type = models.CharField('Тип сообщения', max_length=100, choices=TYPE_MESSAGE_CHOICES)
+    chat = models.ForeignKey('Chat', on_delete=models.CASCADE, related_name='message', verbose_name='Чат')
 
     def __str__(self):
-        return self.author.email + '_' + self.id.__str__()
+        return 'Сообщение {}'.format(self.id)
 
     class Meta:
         verbose_name = 'Собщение'
         verbose_name_plural = 'Собщения'
 
 
-class MessageAdmin(models.Model):
-    text = models.TextField('Текст сообщения')
-    to_message = models.ForeignKey(MessageUser, verbose_name='Кому', on_delete=models.CASCADE)
+class Chat(models.Model):
+    id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)
+    student = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='chat', verbose_name='Ученик')
 
     def __str__(self):
-        return  'admin_to_' + self.to_message.author.email + '_' + self.id.__str__()
+        return 'Чат с {}'.format(self.student)
 
     class Meta:
-        verbose_name = 'Собщение пользователям'
-        verbose_name_plural = 'Собщения пользователям'
+        verbose_name = 'Чат'
+        verbose_name_plural = 'Чаты'

@@ -1,24 +1,13 @@
 from django.contrib import admin
-from .models import MessageUser, MessageAdmin
+from .models import Message, Chat
 
 
-class MassageToUserInline(admin.TabularInline):
-    model = MessageAdmin
+class MassageInline(admin.TabularInline):
+    model = Message
     extra = 0
 
 
-@admin.register(MessageAdmin)
-class MessageToUser(admin.ModelAdmin):
-    list_display = ('id', 'text', 'to_message')
-    list_filter = ['to_message']
-    list_display_links = ('id', 'text')
-
-
-@admin.register(MessageUser)
-class MessageUserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'text', 'author')
-    list_filter = ['author']
-    list_display_links = ('id', 'text')
-    inlines = [MassageToUserInline]
-
-
+@admin.register(Chat)
+class ChatAdmin(admin.ModelAdmin):
+    list_display = ('id', 'student')
+    inlines = [MassageInline]

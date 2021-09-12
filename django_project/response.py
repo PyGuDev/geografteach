@@ -20,8 +20,8 @@ class AccessResponse(BaseResponse):
 
 
 class BadResponse(BaseResponse):
-    status_code = 200
+    status_code = 400
 
 
 class ForbiddenResponse(BaseResponse):
-    status_code = 200
+    status_code = 403

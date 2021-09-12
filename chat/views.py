@@ -1,27 +1,39 @@
-from rest_framework import generics
+from rest_framework.generics import CreateAPIView, ListAPIView
 
-from .models import MessageAdmin, MessageUser
-from .serializer import MessagesToAdminSerializer, MessagesToUserSerializer
+from django_project.response import AccessResponse, BadResponse
+
+from .actions import CreateMessage, CreateChat
+from .serializer import ChatSerializer, MessageSerializer, CreateMessageSerializer
+from .models import Chat, Message
 
 
-class CreateMessageView(generics.CreateAPIView):
-    serializer_class = MessagesToAdminSerializer
+class CreateChatAPIView(CreateAPIView):
+    serializer_class = ChatSerializer
+    queryset = Chat.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        response_data = CreateChat(data, self.request.user).create()
+        return AccessResponse(data=response_data)
 
 
-class ListMessageToAdmin(generics.ListAPIView):
-    serializer_class = MessagesToAdminSerializer
+class CreateMessageAPIView(CreateAPIView):
+    serializer_class = CreateMessageSerializer
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        chat, _ = Chat.objects.get_or_create(pk=pk)
+        return chat
+
+    def create(self, request, *args, **kwargs):
+        data = self.request.data.copy()
+        response_data = CreateMessage(data, self.request.user, self.get_object()).create()
+        return AccessResponse(data=response_data)
+
+
+class ListMessageAPIView(ListAPIView):
+    serializer_class = MessageSerializer
 
     def get_queryset(self):
-        if self.request.user.is_admin:
-            queryset = MessageUser.objects.all()
-        else:
-            queryset = MessageUser.objects.filter(author=self.request.user)
-        return queryset
-
-
-class ListMessageToUser(generics.ListAPIView):
-    serializer_class = MessagesToUserSerializer
-
-    def get_queryset(self):
-        queryset = MessageAdmin.objects.filter(to_message__author=self.request.user)
-        return queryset
+        pk = self.kwargs.get('pk')
+        return Message.objects.filter(chat__id=pk)

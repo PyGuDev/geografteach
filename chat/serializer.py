@@ -1,18 +1,26 @@
 from rest_framework import serializers
-from .models import MessageUser, MessageAdmin
+
+from .models import Chat, Message
 
 
-class MessagesToAdminSerializer(serializers.ModelSerializer):
-    """Сериализатор сообщений админу"""
-
+class ChatSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MessageUser
-        fields = "__all__"
+        model = Chat
+        fields = ['id', 'student']
+        extra_kwargs = {'id': {'read_only': True}, 'student': {'required': False}}
 
 
-class MessagesToUserSerializer(serializers.ModelSerializer):
-    """Сериализатор сообщений пользователям"""
-
+class BaseMessageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MessageAdmin
-        fields = "__all__"
+        model = Message
+        extra_kwargs = {'id': {'read_only': True}}
+
+
+class MessageSerializer(BaseMessageSerializer):
+    class Meta(BaseMessageSerializer.Meta):
+        fields = ['id', 'text', 'type', 'chat']
+
+
+class CreateMessageSerializer(BaseMessageSerializer):
+    class Meta(BaseMessageSerializer.Meta):
+        fields = ['id', 'text', 'chat']
