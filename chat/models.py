@@ -4,19 +4,19 @@ from django.db import models
 from user.models import User
 
 
-class MessageAuthor:
-    STUDENT = 'student'
-    ADMIN = 'admin'
+class MessageType:
+    IN = 'incoming'
+    OUT = 'outgoing'
 
 
 class Message(models.Model):
-    AUTHOR_CHOICES = [
-        (MessageAuthor.ADMIN, 'Администратор'),
-        (MessageAuthor.STUDENT, 'Ученик')
+    TYPE_MESSAGE_CHOICES = [
+        (MessageType.OUT, 'Исходящие'),
+        (MessageType.IN, 'Входящие')
     ]
     id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)
     text = models.TextField('Текст сообщения')
-    author = models.CharField('Кто отправил', max_length=100, choices=AUTHOR_CHOICES)
+    type = models.CharField('Тип сообщения', max_length=100, choices=TYPE_MESSAGE_CHOICES)
     chat = models.ForeignKey('Chat', on_delete=models.CASCADE, related_name='message', verbose_name='Чат')
 
     def __str__(self):
