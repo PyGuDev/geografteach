@@ -25,3 +25,7 @@ class BadResponse(BaseResponse):
 
 class ForbiddenResponse(BaseResponse):
     status_code = 403
+
+
+class CreatedResponse(BaseResponse):
+    status_code = 201
