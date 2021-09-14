@@ -52,7 +52,7 @@ class Article(models.Model):
 class ImagesForArticle(models.Model):
     """Модель изображения для постов"""
     img = models.ImageField('Изображение', upload_to='uploads/images/article/', blank=True)
-    article = models.ForeignKey(Article, verbose_name='Пост', on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, verbose_name='Пост', related_name='images', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.img.name
