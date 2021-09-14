@@ -20,6 +20,11 @@ class ArticleSerializer(serializers.ModelSerializer):
     like_user = serializers.BooleanField()
     count_like = serializers.IntegerField()
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    images = serializers.SerializerMethodField('get_images')
+
+    def get_images(self, obj: Article):
+        images = obj.images.all()
+        return ImagesForArticleSerializer(instance=images).data
 
     class Meta:
         model = Article
@@ -35,6 +40,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             'visit',
             'like_user',
             'count_like',
+            'images'
         )
 
 
