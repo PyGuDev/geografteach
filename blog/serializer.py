@@ -48,7 +48,7 @@ class ImagesForArticleSerializer(serializers.ModelSerializer):
     """Сериалайзер изображений для постов"""
     class Meta:
         model = ImagesForArticle
-        fields = "__all__"
+        fields = ['img']
 
 
 class FileListSerializer(serializers.ModelSerializer):
