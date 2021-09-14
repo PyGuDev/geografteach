@@ -1,17 +1,12 @@
 import django_filters
-from django.http import HttpResponse
-from django.utils.encoding import escape_uri_path
 from django_project.response import AccessResponse
 from rest_framework import generics
 from rest_framework import permissions
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .actions import LikeArticle
-from .models import Article, Category, File, ImagesForArticle
-from .serializer import CategorySerializer, ArticleSerializer, FileListSerializer, \
-    ImagesForArticleSerializer
-from .service import PaginationApp, get_client_ip
+from .models import Article, Category, File
+from .serializer import CategorySerializer, ArticleSerializer, FileListSerializer
+from .service import PaginationApp
 from .filters import ArticleFilter
 
 
@@ -32,16 +27,6 @@ class ArticleListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Article.objects.get_article_with_likes(self.request)
-
-
-class ImagesForArticleView(generics.ListAPIView):
-    """Вывод списка изображений для поста"""
-    serializer_class = ImagesForArticleSerializer
-    permission_classes = (permissions.AllowAny,)
-
-    def get_queryset(self):
-        queryset = ImagesForArticle.objects.filter(article=self.request.GET['id'])
-        return queryset
 
 
 class SingleArticleView(generics.RetrieveAPIView):
