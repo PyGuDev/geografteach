@@ -4,9 +4,6 @@ from rest_framework import status
 
 from rest_framework.test import APIClient
 
-from blog.models import Article
-from blog.serializer import ArticleSerializer
-
 
 class BlogTestCase(TestCase):
     fixtures = ['init_data.json']

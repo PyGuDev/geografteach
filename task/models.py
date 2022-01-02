@@ -31,6 +31,7 @@ class Task(models.Model):
     class Meta:
         verbose_name = 'Задние'
         verbose_name_plural = 'Задания'
+        db_table = 'task'
 
 
 class Answer(models.Model):
@@ -54,6 +55,7 @@ class Answer(models.Model):
     class Meta:
         verbose_name = 'Ответ'
         verbose_name_plural = 'Ответы'
+        db_table = 'answer'
 
 
 class ImageTask(models.Model):
@@ -66,3 +68,4 @@ class ImageTask(models.Model):
     class Meta:
         verbose_name = 'Изображение'
         verbose_name_plural = 'Изображения'
+        db_table = 'image_for_task'

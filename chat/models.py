@@ -25,6 +25,7 @@ class Message(models.Model):
     class Meta:
         verbose_name = 'Собщение'
         verbose_name_plural = 'Собщения'
+        db_table = 'message'
 
 
 class Chat(models.Model):
@@ -37,3 +38,4 @@ class Chat(models.Model):
     class Meta:
         verbose_name = 'Чат'
         verbose_name_plural = 'Чаты'
+        db_table = 'chat'

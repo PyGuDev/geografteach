@@ -14,6 +14,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категорию'
         verbose_name_plural = 'Категории'
+        db_table = "category"
 
 
 class ArticleManager(models.Manager):
@@ -47,6 +48,7 @@ class Article(models.Model):
     class Meta:
         verbose_name = 'Статью'
         verbose_name_plural = 'Статьи'
+        db_table = "article"
 
 
 class ImagesForArticle(models.Model):
@@ -60,6 +62,7 @@ class ImagesForArticle(models.Model):
     class Meta:
         verbose_name = "Изображение"
         verbose_name_plural = "Изображения"
+        db_table = "image"
 
 
 class Like(models.Model):
@@ -74,6 +77,7 @@ class Like(models.Model):
     class Meta:
         verbose_name = "Лайк"
         verbose_name_plural = "Лайки"
+        db_table = "like"
 
 
 class File(models.Model):
@@ -91,6 +95,7 @@ class File(models.Model):
         verbose_name = 'Файл'
         verbose_name_plural = 'Файлы'
         ordering = ['-pk']
+        db_table = "file"
 
     # Переопределил метод save для сохранения размера файла
     def save(self, *args, **kwargs):
