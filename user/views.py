@@ -2,12 +2,12 @@ from django.shortcuts import redirect
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from django_project.response import AccessResponse
 from .actions import RegistrationUserAction, ConfirmationEmailAction
 from .models import User
-from .serializer import CreateUserSerializer, UserSerializer
+from .serializer import CreateUserSerializer, UserSerializer, TokenSerializer, RefreshTokenSerializer
 
 
 class SignUpUserAPIView(generics.CreateAPIView):
@@ -32,7 +32,11 @@ class ConfirmUserAPIView(APIView):
 
 class SingInAPIView(TokenObtainPairView):
     """Авторизация пользователя"""
-    pass
+    serializer_class = TokenSerializer
+
+
+class RefreshTokenAPIView(TokenRefreshView):
+    serializer_class = RefreshTokenSerializer
 
 
 class GetUserAPIView(generics.RetrieveAPIView):

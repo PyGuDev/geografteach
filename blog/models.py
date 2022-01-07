@@ -26,7 +26,7 @@ class ArticleManager(models.Manager):
             )
         ).annotate(
             count_like=models.Count('likes', filter=models.Q(likes__is_like=True))
-        ).order_by('pk')
+        ).order_by('-pub_date')
 
 
 class Article(models.Model):

@@ -21,6 +21,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     count_like = serializers.IntegerField()
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
     images = serializers.SerializerMethodField('get_images')
+    pub_date = serializers.DateField(format="%d.%m.%Y")
 
     def get_images(self, obj: Article):
         images = obj.images.all()
