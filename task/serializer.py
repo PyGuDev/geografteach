@@ -4,6 +4,7 @@ from .models import Answer, ImageTask, Task
 
 class TaskSerializer(serializers.ModelSerializer):
     """Задание"""
+    date = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
 
     class Meta:
         model = Task

@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import generics
 
 from .models import Answer, Task, ImageTask
@@ -16,7 +17,13 @@ class TaskListView(generics.ListAPIView):
 
 class TaskView(generics.RetrieveAPIView):
     serializer_class = TaskSerializer
-    queryset = Task.objects.get_available_tasks()
+
+    def get_queryset(self):
+        return Task.objects.get_tasks_by_class_number(self.request.user.class_number)
+
+    def get_object(self):
+        pk = self.kwargs.get('task_pk')
+        return self.get_queryset().get(pk=pk)
 
 
 class TaskImagesView(generics.ListAPIView):
@@ -34,14 +41,21 @@ class AddAnswerView(generics.CreateAPIView):
     serializer_class = AddAnswerSerializer
 
 
-class AnswerView(generics.ListAPIView):
+class AnswerView(generics.RetrieveAPIView):
     """Вывод ответа"""
     serializer_class = AnswerSerializer
 
     def get_queryset(self):
-        pk = self.kwargs.get('pk')
-        queryset = Answer.objects.filter(task_pk=pk)
-        return queryset
+        return Answer.objects.all()
+
+    def get_object(self):
+        user = self.request.user
+        task_pk = self.kwargs.get('task_pk')
+        try:
+            answer = self.get_queryset().get(task_id=task_pk, author_id=user.id)
+        except Answer.DoesNotExist:
+            raise Http404
+        return answer
 
 
 class AnswerListView(generics.ListAPIView):
