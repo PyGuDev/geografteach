@@ -1,8 +1,14 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from rest_framework import generics
+from django.shortcuts import redirect
+from django.utils import timezone
+from rest_framework import generics, views
+from rest_framework.exceptions import APIException
+from rest_framework.response import Response
 
-from .models import Answer, Task, ImageTask
-from .serializer import TaskSerializer, ImagesSerializer, AddAnswerSerializer, AnswerSerializer
+from .models import Answer, Task, ImageTask, TestTask, TestQuestion, TestSession, UserAnswerForQuestion
+from .serializer import TaskSerializer, ImagesSerializer, AddAnswerSerializer, AnswerSerializer, TestTaskSerializer, \
+    ListTestTaskSerializer, ListTestQuestionSerializer, UserAnswerForQuestionSerializer, TestResultSerializer
 
 
 class TaskListView(generics.ListAPIView):
@@ -66,3 +72,139 @@ class AnswerListView(generics.ListAPIView):
         author = self.request.user
         queryset = Answer.objects.filter(author=author)
         return queryset
+
+
+class ListTestView(generics.ListAPIView):
+    serializer_class = ListTestTaskSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_admin:
+            return TestTask.objects.filter()
+        return TestTask.objects.filter(class_student=user.class_number, enabled=True)
+
+
+class BaseTestMixin:
+    def get_test(self):
+        test_pk = self.kwargs.get('test_pk')
+        try:
+            obj = TestTask.objects.get(pk=test_pk)
+        except TestQuestion.DoesNotExist:
+            raise Http404
+        return obj
+
+
+class TestView(BaseTestMixin, generics.ListAPIView):
+    serializer_class = ListTestQuestionSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        test = self.get_test()
+        if user.is_admin:
+            return TestQuestion.objects.filter(test__enabled=True, test=test)
+        return TestQuestion.objects.filter(test__class_student=user.class_number, test=test)
+
+    def list(self, request, *args, **kwargs):
+        session = self.get_test_session()
+        if session.end_time or session.test.duration_session + session.start_time < timezone.now():
+            return redirect('result_test', test_pk=session.test.pk, session_pk=session.pk)
+
+        return super().list(request, *args, **kwargs)
+
+    def get_test_session(self) -> TestSession:
+        session_pk = self.kwargs.get('session_pk')
+        try:
+            return self.request.user.test_sessions.get(pk=session_pk)
+        except TestSession.DoesNotExist:
+            raise Http404
+
+
+class CreateTestSessionView(BaseTestMixin, views.APIView):
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        test = self.get_test()
+        session, _ = TestSession.objects.get_or_create(test=test, user=user)
+        return redirect('detail_test', test_pk=test.pk, session_pk=session.pk)
+
+
+class CreateTestResultView(generics.GenericAPIView):
+    serializer_class = UserAnswerForQuestionSerializer
+    queryset = UserAnswerForQuestion.objects.all()
+
+    def get_serializers(self, *args, **kwargs):
+        return super().get_serializer(many=True, *args, *kwargs)
+
+    def get_test_session(self):
+        session_pk = self.kwargs.get('session_pk')
+        try:
+            session = self.request.user.test_sessions.get(pk=session_pk)
+            return session
+        except TestSession.DoesNotExist:
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        session = self.get_test_session()
+        if session.end_time is None:
+            raise Http404
+        serializer = TestResultSerializer(instance=session)
+        return Response(serializer.data, status=200)
+
+    def post(self, request, *args, **kwargs):
+        session = self.get_test_session()
+
+        if session.end_time:
+            return redirect('.')
+
+        raw_data = self.request.data
+        serializer = self.serializer_class(many=True, data=raw_data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        self.validate_answers(data)
+        count_current_answer = 0
+        for item in data:
+            answer = UserAnswerForQuestion(
+                question_id=item.get('question'),
+                answer_id=item.get('answer'),
+                session=session
+            )
+            count_current_answer += answer.answer.is_current
+            answer.save()
+
+        session.end_time = timezone.now()
+        session.result = (session.test.questions.count() / 100) * count_current_answer
+        session.save()
+        return redirect('.')
+
+    def validate_answers(self, data: list):
+        custom_exception = APIException
+        custom_exception.status_code = 400
+
+        for item in data:
+            question_id = item.get('question')
+            answer_id = item.get('answer')
+            try:
+                question = TestQuestion.objects.get(pk=question_id)
+                answer = UserAnswerForQuestion.objects.get(pk=answer_id)
+                if answer.question != question:
+                    custom_exception.default_detail = {
+                        'msg': f'Answer id={answer.pk} not equal question id={question.pk}'
+                    }
+                    raise custom_exception
+
+            except ObjectDoesNotExist:
+                custom_exception.default_detail = {
+                    'msg': f'Invalid answer_id={answer_id} or question_id={question_id}'
+                }
+                raise custom_exception
+
+            except TypeError:
+                custom_exception.default_detail = {
+                    'msg': f'Invalid answer_id={answer_id} or question_id={question_id}'
+                }
+                raise custom_exception
+
+
+
+class TestSessionView(generics.CreateAPIView):
+    """Cессия теста"""
+    pass

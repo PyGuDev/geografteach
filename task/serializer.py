@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Answer, ImageTask, Task
+from .models import Answer, ImageTask, Task, TestTask, TestQuestion, TestSession, PossibleQuestionAnswer,\
+    UserAnswerForQuestion
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -39,3 +40,66 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = '__all__'
+
+
+class ListTestTaskSerializer(serializers.ModelSerializer):
+    """Сериализатор списка вывода тестов"""
+    class Meta:
+        model = TestTask
+        exclude = ['enabled', 'class_student']
+
+
+class TestTaskSerializer(serializers.ModelSerializer):
+    """Сериализатор вывода тестов"""
+    class Meta:
+        model = TestTask
+        exclude = ['enabled', 'class_student']
+
+
+class TestTaskSessionSerializer(serializers.ModelSerializer):
+    """Сериализатор сессии тестов"""
+    class Meta:
+        model = TestSession
+        fields = '__all__'
+
+
+class PossibleQuestionAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PossibleQuestionAnswer
+        fields = ['id', 'answer']
+
+
+class ListTestQuestionSerializer(serializers.ModelSerializer):
+    answers = serializers.SerializerMethodField('get_answers')
+
+    def get_answers(self, obj):
+        answers = obj.answers.all()
+        return PossibleQuestionAnswerSerializer(instance=answers, many=True).data
+
+    class Meta:
+        model = TestQuestion
+        exclude = ['test']
+
+
+class TestQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestQuestion
+        fields = ['id']
+
+
+class AnswerForQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PossibleQuestionAnswer
+        fields = ['id']
+
+
+class UserAnswerForQuestionSerializer(serializers.Serializer):
+    question = serializers.IntegerField(required=True)
+    answer = serializers.IntegerField(required=True)
+
+
+class TestResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestSession
+        fields = '__all__'
+

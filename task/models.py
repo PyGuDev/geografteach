@@ -1,8 +1,25 @@
 import uuid
 
 from django.db import models
+from django.utils import timezone
 
 from user.models import User
+
+
+class ModelBaseByClassStudent(models.Model):
+    CLASS_NUMBERS = (
+        ('5', '5 класс'),
+        ('6', '6 класс'),
+        ('7', '7 класс'),
+        ('8', '8 класс'),
+        ('9', '9 класс'),
+        ('10', '10 класс'),
+        ('11', '11 класс'),
+    )
+    class_student = models.CharField('Класс', max_length=15, choices=CLASS_NUMBERS, )
+
+    class Meta:
+        abstract = True
 
 
 class TaskManager(models.Manager):
@@ -13,18 +30,8 @@ class TaskManager(models.Manager):
         return self.get_available_tasks().filter(class_student=class_number)
 
 
-class Task(models.Model):
-    CLASS_NUMBERS = (
-        ('5', '5 класс'),
-        ('6', '6 класс'),
-        ('7', '7 класс'),
-        ('8', '8 класс'),
-        ('9', '9 класс'),
-        ('10', '10 класс'),
-        ('11', '11 класс'),
-    )
+class Task(ModelBaseByClassStudent):
     title = models.CharField('Название', max_length=255)
-    class_student = models.CharField('Класс', max_length=15, choices=CLASS_NUMBERS)
     description = models.TextField('Описание')
     date = models.DateTimeField('Дата сдачи')
     available = models.BooleanField('Автивно', default=True)
@@ -77,10 +84,11 @@ class ImageTask(models.Model):
         db_table = 'image_for_task'
 
 
-class TestTask(models.Model):
+class TestTask(ModelBaseByClassStudent):
     uid = models.CharField(max_length=36, primary_key=True, default=uuid.uuid4)
     title = models.CharField('Название', max_length=300)
     duration_session = models.DurationField('Время на прохождение')
+    enabled = models.BooleanField('Активно', default=True)
     expiry_date = models.DateTimeField('Дата окончания действия', blank=True, null=True)
 
     def __str__(self):
@@ -122,10 +130,10 @@ class PossibleQuestionAnswer(models.Model):
 
 class TestSession(models.Model):
     test = models.ForeignKey('TestTask', on_delete=models.CASCADE, related_name='test_sessions')
-    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
-    start_time = models.DateTimeField('Время начала')
-    end_time = models.DateTimeField('Время завершения')
-    result = models.DecimalField('Результат в процентах', decimal_places=1, max_digits=4, blank=True)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='test_sessions')
+    start_time = models.DateTimeField('Время начала', default=timezone.now)
+    end_time = models.DateTimeField('Время завершения', blank=True, null=True)
+    result = models.DecimalField('Результат в процентах', decimal_places=1, max_digits=4, blank=True, null=True)
 
     def __str__(self):
         return f'Тест: {self.test} пользователь: {self.user}'
