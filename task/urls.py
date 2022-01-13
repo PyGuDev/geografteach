@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import TaskListView, TaskView, TaskImagesView, AddAnswerView, AnswerListView, AnswerView, ListTestView, \
-    TestView, CreateTestResultView, CreateTestSessionView
+    TestView, CreateTestResultView, CreateTestSessionView, TestExpireTime
 
 urlpatterns = [
     path('task/', TaskListView.as_view()),
@@ -11,6 +11,7 @@ urlpatterns = [
     path('test/', ListTestView.as_view(), name='list_test'),
     path('test/<slug:test_pk>/session', CreateTestSessionView.as_view(), name='create_test_session'),
     path('test/<slug:test_pk>/session/<int:session_pk>', TestView.as_view(), name='detail_test'),
+    path('test/<slug:test_pk>/session/<int:session_pk>/time', TestExpireTime.as_view(), name='expire_session'),
     path('test/<slug:test_pk>/session/<int:session_pk>/result', CreateTestResultView.as_view(), name='result_test'),
 
     # path('task/<int:task_pk>/answer/<int:answer_pk>', AnswerView.as_view())

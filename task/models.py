@@ -1,4 +1,5 @@
 import uuid
+from datetime import timedelta
 
 from django.db import models
 from django.utils import timezone
@@ -61,13 +62,14 @@ class Answer(models.Model):
     task = models.ForeignKey(Task, verbose_name='Задание', related_name='answers', on_delete=models.CASCADE)
     estimation = models.CharField('Оценка', max_length=24, choices=ESTIMATION, blank=True)
     comments_answer = models.TextField('Комментарий к ответу', blank=True)
+    created_at = models.DateTimeField('Время завершения', default=timezone.now)
 
     def __str__(self):
         return self.id.__str__() + '_' + self.author.first_name + '_' + self.author.last_name
 
     class Meta:
-        verbose_name = 'Ответ'
-        verbose_name_plural = 'Ответы'
+        verbose_name = 'Ответ на задание'
+        verbose_name_plural = 'Ответы на задания'
         db_table = 'answer'
 
 
@@ -85,9 +87,19 @@ class ImageTask(models.Model):
 
 
 class TestTask(ModelBaseByClassStudent):
+    DURATION_CHOICES = [
+        (timedelta(minutes=5), '5 минут'),
+        (timedelta(minutes=10), '10 минут'),
+        (timedelta(minutes=20), '20 минут'),
+        (timedelta(minutes=30), '30 минут'),
+        (timedelta(minutes=45), '45 минут'),
+        (timedelta(minutes=60), '60 минут'),
+        (timedelta(minutes=30, hours=1), '1 ч 30 минут'),
+        (timedelta(hours=2), '2 ч'),
+    ]
     uid = models.CharField(max_length=36, primary_key=True, default=uuid.uuid4)
     title = models.CharField('Название', max_length=300)
-    duration_session = models.DurationField('Время на прохождение')
+    duration_session = models.DurationField('Время на прохождение', choices=DURATION_CHOICES)
     enabled = models.BooleanField('Активно', default=True)
     expiry_date = models.DateTimeField('Дата окончания действия', blank=True, null=True)
 

@@ -36,21 +36,55 @@ class AnswerSerializer(serializers.ModelSerializer):
     """Вывод полной информации ответа"""
     author = serializers.SlugRelatedField(slug_field='email', read_only=True)
     task = serializers.SlugRelatedField(slug_field='title', read_only=True)
+    created_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
 
     class Meta:
         model = Answer
         fields = '__all__'
 
 
-class ListTestTaskSerializer(serializers.ModelSerializer):
+class AnswerSerializerByListTask(serializers.ModelSerializer):
+    """Вывод полной информации ответа"""
+    created_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
+
+    class Meta:
+        model = Answer
+        fields = ['estimation', 'created_at', ]
+
+
+class FormattingDurationMixin:
+    def formatting_duration(self, obj):
+        if obj.duration_session:
+            raw_duration_session = str(obj.duration_session).split(' ')
+            if len(raw_duration_session) > 1:
+                day = f'{raw_duration_session[0]} д'
+            else:
+                day = None
+            raw_time = raw_duration_session[-1].split(':')
+
+            hour = f'{int(raw_time[0])} час' if int(raw_time[0]) >= 1 else None
+            minute = f'{int(raw_time[1])} мин' if int(raw_time[1]) >= 1 else None
+            second = f'{int(raw_time[2])} сек' if int(raw_time[2]) >= 1 else None
+            duration = [day, hour, minute, second]
+            duration = ' '.join(list(filter(lambda x: True if x else False, duration)))
+            return duration
+        return None
+
+
+class ListTestTaskSerializer(serializers.ModelSerializer, FormattingDurationMixin):
     """Сериализатор списка вывода тестов"""
+    expiry_date = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
+    duration_session = serializers.SerializerMethodField('formatting_duration')
+
     class Meta:
         model = TestTask
         exclude = ['enabled', 'class_student']
 
 
-class TestTaskSerializer(serializers.ModelSerializer):
+class TestTaskSerializer(serializers.ModelSerializer, FormattingDurationMixin):
     """Сериализатор вывода тестов"""
+    duration_session = serializers.SerializerMethodField('formatting_duration')
+
     class Meta:
         model = TestTask
         exclude = ['enabled', 'class_student']
@@ -99,7 +133,20 @@ class UserAnswerForQuestionSerializer(serializers.Serializer):
 
 
 class TestResultSerializer(serializers.ModelSerializer):
+    test = TestTaskSerializer()
+    start_time = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
+    end_time = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
+
     class Meta:
         model = TestSession
         fields = '__all__'
+
+
+class TestResultSerializerForListTest(serializers.ModelSerializer):
+    start_time = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
+    end_time = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
+
+    class Meta:
+        model = TestSession
+        exclude = ['test']
 
