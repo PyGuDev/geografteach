@@ -117,7 +117,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 CORS_ORIGIN_WHITELIST = [
-    "http://194.58.121.102:80",
+    "http://193.124.206.128:80",
     "http://geografteach.ru",
     "http://localhost:8080"
 ]
