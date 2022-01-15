@@ -71,8 +71,12 @@ WSGI_APPLICATION = 'django_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'HOST': os.getenv('DB_HOST'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'PORT': os.getenv('DB_PORT')
     }
 }
 
@@ -145,7 +149,7 @@ SIMPLE_JWT = {
 }
 
 CKEDITOR_UPLOAD_PATH = "uploads/article/"
-CKEDITOR_SERVER_URL = 'http://127.0.0.1:8000'
+CKEDITOR_SERVER_URL = os.getenv('SERVER_URL')
 CKEDITOR_CONFIGS = {
     'default': {
         'skin': 'moono',
