@@ -1,3 +1,5 @@
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 from rest_framework.request import Request
 
@@ -33,8 +35,8 @@ class Article(models.Model):
     """Пост"""
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
     title = models.CharField('Заголовок', max_length=255, blank=False)
-    text = models.TextField('Текст', blank=False)
-    img = models.ImageField('Изображение', blank=True)
+    text = RichTextUploadingField(config_name='default', verbose_name='Текст')
+    img = models.ImageField('Изображение', upload_to='uploads/article/', blank=True)
     url_youtube = models.URLField('Ссылка на ютуб видео', blank=True)
     is_available = models.BooleanField('Активно', default=True)
     pub_date = models.DateField('Дата публикации', auto_now_add=True, blank=True)
@@ -107,3 +109,16 @@ class File(models.Model):
             self.size = str(self.file.file.size) + ' байт'
         self.type_file = str(self.file).split('/')[-1].split('.')[-1]
         super().save(*args, **kwargs)
+
+
+class TagFile(models.Model):
+    title = models.CharField('Название', max_length=300)
+    file = models.ForeignKey('File', on_delete=models.CASCADE, related_name='tags')
+
+    def __int__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'Тэг для файла'
+        verbose_name_plural = 'Тэги для файлов'
+        db_table = "tag_file"

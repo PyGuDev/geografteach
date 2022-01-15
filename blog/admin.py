@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Article, Like, File, ImagesForArticle
+from .models import Category, Article, Like, File, ImagesForArticle, TagFile
 
 
 class ImagesForArticleInline(admin.TabularInline):
@@ -21,10 +21,22 @@ class LikeAdmin(admin.ModelAdmin):
     list_display = ('is_like', 'ip', 'article')
 
 
+class TagFileInline(admin.TabularInline):
+    model = TagFile
+    extra = 0
+
+
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
     list_display = ('title', 'file', 'size', 'type_file')
     list_filter = ['type_file']
+    inlines = [TagFileInline]
+
+
+@admin.register(TagFile)
+class TagFileAdmin(admin.ModelAdmin):
+    list_display = ['id', 'title', 'file']
+    list_display_links = ['id', 'title']
 
 
 admin.site.register(Category)

@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/user/', include('user.urls')),
     path('api/lk/', include('task.urls')),
     path('api/lk/chat/', include('chat.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
 if settings.DEBUG:

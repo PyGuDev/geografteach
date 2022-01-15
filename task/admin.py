@@ -12,13 +12,18 @@ class ImageTaskInline(admin.TabularInline):
     extra = 0
 
 
+class AnswerForTaskInline(admin.TabularInline):
+    model = Answer
+    extra = 0
+
+
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     list_filter = ['available', 'class_student']
     list_display = ('id', 'title', 'date', 'available', 'class_student')
     search_fields = ['title']
     list_display_links = ('id', 'title')
-    inlines = [ImageTaskInline]
+    inlines = [ImageTaskInline, AnswerForTaskInline]
 
 
 @admin.register(Answer)

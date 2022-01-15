@@ -7,7 +7,7 @@ from .actions import LikeArticle
 from .models import Article, Category, File
 from .serializer import CategorySerializer, ArticleSerializer, FileListSerializer
 from .service import PaginationApp
-from .filters import ArticleFilter
+from .filters import ArticleFilter, FileFilter
 
 
 class CategoryView(generics.ListAPIView):
@@ -39,6 +39,7 @@ class SingleArticleView(generics.RetrieveAPIView):
 
     def get_object(self):
         obj = super().get_object()
+        print(obj.text)
         obj.visit += 1
         obj.save()
         return obj
@@ -58,3 +59,6 @@ class FileListView(generics.ListAPIView):
     serializer_class = FileListSerializer
     queryset = File.objects.all()
     permission_classes = (permissions.AllowAny,)
+    pagination_class = PaginationApp
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_class = FileFilter

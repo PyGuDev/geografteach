@@ -1,5 +1,8 @@
+from django.utils.html import strip_tags
 from rest_framework import serializers
-from .models import Article, Category, Like, File, ImagesForArticle
+
+from django_project.settings import CKEDITOR_SERVER_URL
+from .models import Article, Category, Like, File, ImagesForArticle, TagFile
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -14,6 +17,12 @@ class SingleArticleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TagsFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TagFile
+        fields = ['title']
+
+
 class ArticleSerializer(serializers.ModelSerializer):
     """Сериализация постов"""
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
@@ -22,6 +31,11 @@ class ArticleSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
     images = serializers.SerializerMethodField('get_images')
     pub_date = serializers.DateField(format="%d.%m.%Y")
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['text'] = instance.text.replace('/media/uploads', f'{CKEDITOR_SERVER_URL}/media/uploads')
+        return data
 
     def get_images(self, obj: Article):
         images = obj.images.all()
@@ -54,6 +68,12 @@ class ImagesForArticleSerializer(serializers.ModelSerializer):
 
 class FileListSerializer(serializers.ModelSerializer):
     """Сериалайзер файлов"""
+    tags = serializers.SerializerMethodField('get_tags')
+
+    def get_tags(self, obj):
+        files = obj.tags.all()
+        return TagsFileSerializer(instance=files, many=True, read_only=True).data
+
     class Meta:
         model = File
         fields = '__all__'
@@ -65,4 +85,3 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name')
-
