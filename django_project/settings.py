@@ -119,6 +119,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 CORS_ORIGIN_WHITELIST = [
     "http://193.124.206.128:80",
     "http://geografteach.ru",
+    "https://geografteach.ru",
     "http://localhost:8080"
 ]
 
@@ -149,7 +150,7 @@ SIMPLE_JWT = {
 }
 
 CKEDITOR_UPLOAD_PATH = "uploads/article/"
-CKEDITOR_SERVER_URL = os.getenv('SERVER_URL')
+SERVER_URL = os.getenv('SERVER_URL')
 CKEDITOR_CONFIGS = {
     'default': {
         'skin': 'moono',
