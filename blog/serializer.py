@@ -1,7 +1,7 @@
 from django.utils.html import strip_tags
 from rest_framework import serializers
 
-from django_project.settings import CKEDITOR_SERVER_URL
+from django_project.settings import SERVER_URL
 from .models import Article, Category, Like, File, ImagesForArticle, TagFile
 
 
@@ -34,7 +34,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['text'] = instance.text.replace('/media/uploads', f'{CKEDITOR_SERVER_URL}/media/uploads')
+        data['text'] = instance.text.replace('/media/uploads', f'{SERVER_URL}/media/uploads')
         return data
 
     def get_images(self, obj: Article):
